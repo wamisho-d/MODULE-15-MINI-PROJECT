@@ -1,0 +1,43 @@
+# Creating a Chat Room:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>join Room</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>join a Chat Room</h1>
+    <input type="text" id="room" placeholder="Enter room name">
+    <button onclick="joinRoom()">join Room</button>
+
+
+    <script>
+        const socket = io();
+
+        function joinRoom() {
+            const room = document.getElementById('room').value;
+            socket.emit('join', {room: room});
+            alert('joined room: ' + room);
+
+        }
+
+    </script>
+</body>
+</html>
+
+# Room Handling on the Server:
+from flask_socketio import join_room, leave_room
+
+@socketio.on('join')
+def handle_join(data):
+    room = data['room']
+    join_room(room)
+    emit('message', {'data': f'User has joined room {room}'}, room=room)
+
+@socketio.on('leave')
+def handle_leave(data):
+    room = data['room']
+    leave_room(room)
+    emit('message', {'data': f'User has left room {room}'}, room=room)
